@@ -7,8 +7,17 @@ export default function Home() {
   console.log(session);
   return (
     <main>
-      <section className="">
-        <Header className="header" />
+      <section className=" ">
+        <div className="h-[200vh]">
+          <div className="sticky top-0 h-screen">
+            <Header className="header sticky" />
+          </div>
+        </div>
+      </section>
+      <section>
+        <div className="container mx-auto my-40">
+          <h1 className="heading text-5xl">Chat with fluent UI!</h1>
+        </div>
       </section>
     </main>
   );

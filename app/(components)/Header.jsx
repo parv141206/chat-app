@@ -1,15 +1,19 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TextPlugin } from "gsap/TextPlugin";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
 const Header = () => {
   const [text, setText] = useState("Chat with your friends with ease!");
+  const { data: session } = useSession();
 
   useEffect(() => {
+    console.log("Animation setup started"); // Debugging log
+
     var tl = gsap.timeline({ defaults: { duration: 2, ease: "none" } });
 
     tl.to("#scramble", {
@@ -22,7 +26,14 @@ const Header = () => {
       },
     });
 
-    const tl2 = gsap.timeline({
+    const tl3 = gsap.timeline({
+      defaults: {
+        ease: "bounce",
+        duration: 2,
+      },
+    });
+
+    const tl4 = gsap.timeline({
       scrollTrigger: {
         trigger: ".header",
         start: "top top",
@@ -32,30 +43,58 @@ const Header = () => {
         markers: false,
       },
     });
-    const tl3 = gsap.timeline({
-      defaults: {
-        ease: "bounce",
-        duration: 2,
+    tl4.to("#img-1", {
+      scale: 2,
+      opacity: 0,
+      duration: 1,
+    });
+    const tl5 = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".header",
+        start: "top top",
+        end: "+=1000",
+        scrub: 1,
+        pin: true,
+        markers: false,
       },
     });
-    // Adjusted scaling animation for smooth scaling down
-    tl3.fromTo("#scramble", { scale: 2 }, { scale: 1 });
-    tl2.to(".box", { yPercent: 250, duration: 1 });
-    tl2.to(".box", { rotation: 90, duration: 1 });
-    tl2.to(".box", { xPercent: 350, duration: 1 });
-  }, [text]); // Include text in the dependency array if it can change
+    tl5.to(".img-2", {
+      scale: 1.2,
+      duration: 1,
+    });
+    tl4.to("#scramble", {
+      scale: 1.2,
+      duration: 1,
+    });
+    console.log("Animation setup completed"); // Debugging log
+  }, [text]);
 
   return (
     <>
-      <div className="scramble-text flex h-screen items-center justify-center ">
-        <div
-          id="scramble"
-          className="text-balance text-center text-5xl font-extrabold md:w-1/2"
-        >
-          XOXOXXOXO XOXOXXO XOXOXOXO XOXOXO
+      <div id="img-1" className="img-1"></div>
+      <div className="img-2"></div>
+      <div className="first ">
+        <div className="scramble-text flex h-screen flex-col items-center justify-center gap-5 ">
+          <div
+            id="scramble"
+            className="elegant text-balance text-center text-5xl font-extrabold md:w-1/2"
+          >
+            XOXOXXOXO XOXOXXO XOXOXOXO XOXOXO
+          </div>
+          {session && session.user ? (
+            <div className="btn-form">
+              <Link href="/chat">
+                <div className="btn-text ">CHAT!</div>
+              </Link>
+            </div>
+          ) : (
+            <Link href="/login">
+              <div className="btn-text">GET STARTED!</div>
+            </Link>
+          )}
         </div>
-        <div className="box absolute -z-10 h-48 w-48 rounded-2xl bg-blue-800"></div>
       </div>
+      {/* Your content here */}
     </>
   );
 };

@@ -5,8 +5,10 @@ import { usePathname } from "next/navigation";
 import { fetchMessagesFromEmail } from "@/app/firebase/functions/fetchUsers";
 import { useSession } from "next-auth/react";
 import { ContactEmailsContext, CurrentEmailContext } from "@/app/layout";
+import Loading from "@/app/(components)/Loading";
 
 export default function Layout({ children }) {
+  const [loading, setLoading] = useState(true);
   const [contactsWithNicknames, setContactsWithNicknames] = useState([]);
   const path = usePathname();
   const { data: session } = useSession();
@@ -44,6 +46,7 @@ export default function Layout({ children }) {
           setContactsWithNicknames(JSON.parse(cachedData));
           setContactEmailsContext(JSON.parse(cachedData));
           setCurrentEmail(JSON.parse(cachedData)[0].email);
+          setLoading(false);
         } else {
           const data = await fetchMessagesFromEmail(email);
           console.log(data);
@@ -56,6 +59,7 @@ export default function Layout({ children }) {
             "contactsWithNicknames",
             JSON.stringify(data.contactsWithNicknames),
           );
+          setLoading(false);
         }
       }
     }
@@ -67,28 +71,39 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen gap-3 md:flex">
-      <div className="flex flex-col p-3 md:w-fit dark:bg-blue-950">
-        <ul>
+      <div className=" left-0 top-0 flex  w-full flex-col  p-3 md:w-fit dark:bg-blue-950">
+        <ul className="sticky top-5">
           <h1 className="text-xl font-bold">Contacts</h1>
-          {contactsWithNicknames.map((contact, index) => (
-            <li
-              key={contact.email}
-              className={`m-2 border-b border-slate-900 p-2 ${path.split("/")[2] === contact.email.trim() ? "rounded-lg border-0 dark:bg-indigo-900" : ""}`}
-            >
-              <Link
-                onClick={() => setCurrentEmail(contact.email)}
-                href={`/chat/${contact.nickname.trim()}`}
+          {loading ? (
+            <div className="m-5 p-5">
+              <Loading />
+            </div>
+          ) : (
+            contactsWithNicknames.map((contact, index) => (
+              <li
+                key={contact.email}
+                className={`m-2 border-b border-slate-900 p-2 ${path.split("/")[2] === contact.email.trim() ? "rounded-lg border-0 dark:bg-indigo-900" : ""}`}
               >
-                <span className="p-1 dark:text-slate-500">#</span>
-                {contact.nickname}
-                <br />
-                <div className="dark:text-slate-500">
-                  <span className="p-1 dark:text-slate-500">@</span>
-                  {contact.email}
-                </div>
-              </Link>
-            </li>
-          ))}
+                <Link
+                  onClick={() => setCurrentEmail(contact.email)}
+                  href={`/chat/${contact.nickname.trim()}`}
+                >
+                  <span className="p-1 dark:text-slate-500">#</span>
+                  {contact.nickname}
+                  <br />
+                  <div className="dark:text-slate-500">
+                    <span className="p-1 dark:text-slate-500">@</span>
+                    {contact.email}
+                  </div>
+                </Link>
+              </li>
+            ))
+          )}
+          <li>
+            <Link href="/chat/add/contact">
+              <div className="btn-secondary bg-green-800 text-center">+</div>
+            </Link>
+          </li>
         </ul>
       </div>
       <div className="w-full md:p-10">{children}</div>

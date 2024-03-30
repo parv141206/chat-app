@@ -2,10 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: Elegant;
+  src: url("../public/fonts/against_regular.otf");
+}
+
+@font-face {
+  font-family: "future";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../public/fonts/ANDMOREY\ Regular.woff") format("woff");
+}
 .login {
   background-image: url("../public/space-bg.jpg");
   background-repeat: no-repeat;
   background-size: cover;
+}
+.elegant {
+  font-family: "Elegant", serif;
+}
+.heading {
+  font-family: "future", serif;
 }
 .input {
   @apply rounded-md border bg-slate-900 bg-opacity-50 p-2 text-current outline-none focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
@@ -16,6 +33,9 @@
 .btn-primary {
   @apply m-3 rounded-3xl border bg-indigo-900 bg-opacity-50 p-2 text-current outline-none transition-all duration-500 hover:bg-opacity-100  focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
 }
+.btn-secondary {
+  @apply m-3 cursor-pointer rounded-3xl border bg-green-600 bg-opacity-75 p-2 text-current outline-none transition-all duration-500 hover:bg-opacity-100  focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
+}
 .message-recieved {
   @apply m-3 w-fit rounded-2xl p-3 dark:bg-green-600;
 }
@@ -23,5 +43,75 @@
   @apply m-3 w-fit rounded-2xl p-3 dark:bg-blue-600;
 }
 .btn-form {
-  @apply rounded-lg bg-blue-800  p-3 font-bold text-current outline-none backdrop-blur-2xl transition-all duration-500 hover:bg-opacity-100 focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
+  @apply cursor-pointer rounded-lg bg-blue-800  p-3 font-bold text-current outline-none backdrop-blur-2xl transition-all duration-500 hover:bg-opacity-100 focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
+}
+.btn-text {
+  @apply cursor-pointer rounded-lg bg-blue-800   font-bold text-current outline-none backdrop-blur-2xl transition-all duration-500 hover:bg-opacity-100 focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
+}
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 40px;
+  height: 20px;
+  background: orange;
+  position: relative;
+  animation: l19-0 1.5s infinite linear;
+}
+.loader:before,
+.loader:after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  bottom: 100%;
+  width: 50%;
+  height: 100%;
+  animation: inherit;
+  animation-name: l19-1;
+}
+.loader:before {
+  left: 0;
+  --s: -1, 1;
+}
+.loader:after {
+  right: 0;
+}
+@keyframes l19-0 {
+  0%,
+  30% {
+    transform: translateY(0) scaleY(1);
+  }
+  49.99% {
+    transform: translateY(-50%) scaleY(1);
+  }
+  50% {
+    transform: translateY(-50%) scaleY(-1);
+  }
+  70%,
+  100% {
+    transform: translateY(-100%) scaleY(-1);
+  }
+}
+@keyframes l19-1 {
+  0%,
+  10%,
+  90%,
+  100% {
+    transform: scale(var(--s, 1)) translate(0);
+  }
+  30%,
+  70% {
+    transform: scale(var(--s, 1)) translate(20px);
+  }
+  50% {
+    transform: scale(var(--s, 1)) translate(20px, 20px);
+  }
+}
+.img-1 {
+  background: radial-gradient(rgba(0, 15, 46, 0.408), rgb(0, 8, 27)),
+    url("../public/cave-big.png");
+  @apply absolute h-screen w-screen bg-cover bg-center bg-no-repeat;
+}
+.img-2 {
+  background: linear-gradient(rgba(0, 0, 0, 0.366), rgba(2, 6, 23)),
+    url("../public/mountains-hd.jpg");
+  @apply absolute -z-10 h-screen w-screen bg-cover bg-center bg-no-repeat;
 }

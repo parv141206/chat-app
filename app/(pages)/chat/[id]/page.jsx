@@ -8,12 +8,14 @@ import { getDateAsId } from "../../../utils/getDateAsId";
 import MessageSent from "@/app/(components)/MessageSent";
 import MessageRecieved from "@/app/(components)/MessageRecieved";
 import { FaArrowRight } from "react-icons/fa";
+import FullPageLoading from "@/app/(components)/FullPageLoading";
 const socket = io("http://localhost:5000");
 
 export default function Page({ params }) {
   const [currentEmail, setCurrentEmail] = useContext(CurrentEmailContext);
   const [messages, setMessages] = useState([]);
-  const { data: session, status } = useSession(); // Destructure status from useSession
+  const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(true); // Initialize loading as true
 
   function generateRoomId(email1, email2) {
     const sortedEmails = [email1, email2].sort();
@@ -22,7 +24,7 @@ export default function Page({ params }) {
   }
 
   useEffect(() => {
-    // Load messages from localStorage on component mount
+    window.scrollTo(0, document.body.scrollHeight);
     const storedMessages = localStorage.getItem("messages");
     if (storedMessages) {
       setMessages(JSON.parse(storedMessages));
@@ -44,11 +46,10 @@ export default function Page({ params }) {
       });
     });
 
-    // Cleanup function to remove the event listener when the component unmounts
     return () => {
       socket.off("recieve_message");
     };
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
   useEffect(() => {
     if (session && session.user && currentEmail) {
@@ -56,22 +57,23 @@ export default function Page({ params }) {
       socket.emit("init", id);
 
       const fetch = async () => {
+        setLoading(true); // Set loading to true before fetching
         const data = await fetchMessagesFromToEmail(
           session.user.email,
           currentEmail,
         );
         setMessages((prevMessages) => {
-          // Merge fetched messages with localStorage messages, avoiding duplicates
           const updatedMessages = [...prevMessages, ...data].filter(
             (msg, index, self) =>
               index === self.findIndex((m) => m.id === msg.id),
           );
           return updatedMessages;
         });
+        setLoading(false); // Set loading to false after fetching
       };
       fetch();
     }
-  }, [currentEmail, session]); // This effect runs when currentEmail or session changes
+  }, [currentEmail, session]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -94,7 +96,7 @@ export default function Page({ params }) {
           content: message,
         };
         const updatedMessages = [...prevMessages, newMessage];
-        localStorage.setItem("messages", JSON.stringify(updatedMessages)); // Update localStorage here
+        localStorage.setItem("messages", JSON.stringify(updatedMessages));
         return updatedMessages;
       });
       e.target.message.value = "";
@@ -116,9 +118,8 @@ export default function Page({ params }) {
     );
   };
 
-  // Conditional rendering based on session status
-  if (status === "loading") {
-    return <div>Loading...</div>; // Or any loading indicator
+  if (loading) {
+    return <FullPageLoading />; // Conditionally render FullPageLoading based on loading state
   }
 
   return (
@@ -129,19 +130,19 @@ export default function Page({ params }) {
       <div className="flex flex-col">{renderMessages()}</div>
       <br />
       <form
-        className="sticky bottom-5  z-10   flex w-full gap-5 p-5 "
+        className="sticky bottom-5 z-10   flex w-full gap-5 p-5 "
         onSubmit={handleSubmit}
         action=""
       >
-        <div className="input flex w-full items-center justify-around  gap-3 backdrop-blur-2xl">
+        <div className="input flex w-full items-center justify-around gap-3 backdrop-blur-2xl">
           <input
-            className="input w-full  rounded-none  "
+            className="input w-full rounded-none "
             placeholder="Enter message"
             name="message"
             id="message"
             type="text"
           />
-          <button className=" w-fit text-xl  font-extrabold" type="submit">
+          <button className=" w-fit text-xl font-extrabold" type="submit">
             <FaArrowRight />
           </button>
         </div>
