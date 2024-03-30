@@ -42,14 +42,15 @@ export default function Layout({ children }) {
         if (cachedData) {
           console.log(cachedData);
           setContactsWithNicknames(JSON.parse(cachedData));
-          setContactEmails(JSON.parse(cachedData));
+          setContactEmailsContext(JSON.parse(cachedData));
           setCurrentEmail(JSON.parse(cachedData)[0].email);
         } else {
           const data = await fetchMessagesFromEmail(email);
           console.log(data);
           setContactsWithNicknames(data.contactsWithNicknames);
-          setContactEmails(JSON.parse(cachedData));
-          setCurrentEmail(JSON.parse(cachedData)[0].email);
+          setContactEmailsContext(data.contactsWithNicknames);
+          console.log(data.contactsWithNicknames[0].email);
+          setCurrentEmail(data.contactsWithNicknames[0].email);
           // Update local storage with new data
           localStorage.setItem(
             "contactsWithNicknames",
@@ -76,7 +77,7 @@ export default function Layout({ children }) {
             >
               <Link
                 onClick={() => setCurrentEmail(contact.email)}
-                href={`${contact.nickname.trim()}`}
+                href={`/chat/${contact.nickname.trim()}`}
               >
                 <span className="p-1 dark:text-slate-500">#</span>
                 {contact.nickname}
