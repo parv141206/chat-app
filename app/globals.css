@@ -2,32 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+.login {
+  background-image: url("../public/space-bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.input {
+  @apply rounded-md border bg-slate-900 bg-opacity-50 p-2 text-current outline-none focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
 }
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.card {
+  @apply rounded-3xl border bg-opacity-50 p-5 shadow-2xl shadow-slate-400 dark:border-slate-100 dark:border-opacity-5 dark:shadow-slate-800 dark:backdrop-blur-md;
 }
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.btn-primary {
+  @apply m-3 rounded-3xl border bg-indigo-900 bg-opacity-50 p-2 text-current outline-none transition-all duration-500 hover:bg-opacity-100  focus:outline-none dark:border-slate-100 dark:border-opacity-5 dark:text-white;
 }

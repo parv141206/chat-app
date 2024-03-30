@@ -1,0 +1,25 @@
+Message schema 
+1. Message id (timestamp)
+2. from_email
+3. to_email
+4. Content
+
+Layout:
+1. For showing chats list, use fetch(from_email == user email order by message id, as timestamp). Store in a set so duplicate messages dont occurre
+Page:
+1. When person clicks a chat, fetch(from_email == user email). Based on to_email/from_email, position the messages.
+
+Socket:
+[SERVER]
+1. [Server] Socket.on(init):
+Return the chats list for layout, return unread messages 
+2. [Server] Socket.on(send_message, to user name):
+Store the message in database
+Emit an event of recieve message for another user 
+3. [Server] Socket.emit(recieve_message, to user name):
+Return the message as cache 
+[CLIENT]
+4. Socket.emit(init)
+Show chats on frontend
+5. Socket.on(recieve_message, message)
+Display on frontend

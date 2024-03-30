@@ -1,0 +1,6 @@
+messages:
+  fields:
+    id: number(timestamp)
+    email_from: string
+    email_to: string
+    content: string
