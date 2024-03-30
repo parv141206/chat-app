@@ -42,13 +42,26 @@ export const fetchMessagesFromEmail = async (email) => {
   return res;
 };
 
-export const fetchMessagesToEmail = async (email) => {
-  const q = query(usersRef, where("to_email", "==", email));
-  const querySnapshot = await getDocs(q);
+export const fetchMessagesFromToEmail = async (emailFrom, emailTo) => {
+  const q1 = query(
+    usersRef,
+    where("from_email", "==", emailFrom),
+    where("to_email", "==", emailTo),
+  );
+  const querySnapshot1 = await getDocs(q1);
 
-  const usersData = querySnapshot.docs.map((doc) => doc.data());
+  const q2 = query(
+    usersRef,
+    where("from_email", "==", emailTo),
+    where("to_email", "==", emailFrom),
+  );
+  const querySnapshot2 = await getDocs(q2);
 
-  console.log(usersData);
+  const usersData1 = querySnapshot1.docs.map((doc) => doc.data());
+  const usersData2 = querySnapshot2.docs.map((doc) => doc.data());
+  const combinedData = [...usersData1, ...usersData2];
 
-  return usersData;
+  console.log(combinedData);
+
+  return combinedData;
 };
