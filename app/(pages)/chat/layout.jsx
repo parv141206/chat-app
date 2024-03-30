@@ -91,7 +91,7 @@ export default function Layout({ children }) {
           ))}
         </ul>
       </div>
-      <div>{children}</div>
+      <div className="w-full md:p-10">{children}</div>
     </div>
   );
 }
