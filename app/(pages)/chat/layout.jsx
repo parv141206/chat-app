@@ -18,23 +18,26 @@ export default function Layout({ children }) {
    * setContactEmailsContext
    * @param {Array} data
    */
-  const setContactEmailsContext = (data) => {
-    let temp = [];
-    const cachedData = localStorage.getItem("contactEmails");
-    if (cachedData) {
-      temp = JSON.parse(cachedData);
-      setContactEmails(temp);
-    } else {
-      data.forEach((contact) => {
-        if (!temp.includes(contact.email)) {
-          temp.push(contact.email);
-        }
-      });
-      setContactEmails(temp);
-      localStorage.setItem("contactEmails", JSON.stringify(temp));
-    }
-    console.log(temp);
-  };
+  const setContactEmailsContext = useCallback(
+    (data) => {
+      let temp = [];
+      const cachedData = localStorage.getItem("contactEmails");
+      if (cachedData) {
+        temp = JSON.parse(cachedData);
+        setContactEmails(temp);
+      } else {
+        data.forEach((contact) => {
+          if (!temp.includes(contact.email)) {
+            temp.push(contact.email);
+          }
+        });
+        setContactEmails(temp);
+        localStorage.setItem("contactEmails", JSON.stringify(temp));
+      }
+      console.log(temp);
+    },
+    [setContactEmails],
+  );
   // Memoize the fetch function
   const fetch = useCallback(async () => {
     if (session && session.user) {
@@ -63,7 +66,7 @@ export default function Layout({ children }) {
         }
       }
     }
-  }, [session]); // Dependency array
+  }, [session, setContactEmailsContext, setCurrentEmail]); // Dependency array
 
   useEffect(() => {
     fetch();
