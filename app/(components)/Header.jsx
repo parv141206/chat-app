@@ -38,7 +38,7 @@ const Header = () => {
         trigger: ".header",
         start: "top top",
         end: "+=1000",
-        scrub: 1,
+        scrub: 4,
         pin: true,
         markers: false,
       },
@@ -46,14 +46,14 @@ const Header = () => {
     tl4.to("#img-1", {
       scale: 2,
       opacity: 0,
-      duration: 1,
+      duration: 2,
     });
     const tl5 = gsap.timeline({
       scrollTrigger: {
         trigger: ".header",
         start: "top top",
         end: "+=1000",
-        scrub: 1,
+        scrub: 4,
         pin: true,
         markers: false,
       },

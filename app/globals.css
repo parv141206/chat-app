@@ -115,3 +115,11 @@
     url("../public/mountains-hd.jpg");
   @apply absolute -z-10 h-screen w-screen bg-cover bg-center bg-no-repeat;
 }
+#after-header {
+  background: linear-gradient(
+      rgba(2, 6, 23),
+      rgba(2, 6, 23, 0.848),
+      rgba(2, 6, 23)
+    ),
+    url("../public/svg/leaves.svg");
+}
