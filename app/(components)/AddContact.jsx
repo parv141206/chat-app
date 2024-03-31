@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import React from "react";
 import { getDateAsId } from "../utils/getDateAsId";
-import { insertMessage } from "../firebase/functions/fetchUsers";
+import { insertMessage } from "../firebase/functions/fetchUsers.js";
 
 export default function AddContact() {
   const { data: session } = useSession();
@@ -17,16 +17,18 @@ export default function AddContact() {
       content: "Hello, I'd like to add you as a contact",
       id: getDateAsId(),
     };
-    insertMessage(message);
+    insertMessage(message, nickname);
   };
   return (
-    <div>
-      <form onSubmit={handleSubmit} action="">
+    <div className="md:w-1/2">
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit} action="">
         <label htmlFor="nickname">Nickname</label>
-        <input type="text" name="nickname" id="nickname" />
+        <input className="input" type="text" name="nickname" id="nickname" />
         <label htmlFor="email">Email</label>
-        <input type="email" name="email" id="email" />
-        <button type="submit">Add Contact</button>
+        <input className="input" type="email" name="email" id="email" />
+        <button className="btn-secondary" type="submit">
+          Add Contact
+        </button>
       </form>
     </div>
   );

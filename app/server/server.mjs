@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { insertMessageNormal } from "../firebase/functions/insert.mjs";
 
 const io = new Server(5000, {
   cors: {
@@ -17,6 +18,7 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     console.log(data);
     // Check if the sender is not the recipient
+    insertMessageNormal(data);
     if (data.from_email !== data.to_email) {
       socket.to(data.roomId).emit("recieve_message", data);
     }

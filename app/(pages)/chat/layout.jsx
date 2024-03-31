@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useCallback, useContext } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { fetchMessagesFromEmail } from "@/app/firebase/functions/fetchUsers";
+import { fetchMessagesFromEmail } from "../../firebase/functions/fetchUsers.js";
 import { useSession } from "next-auth/react";
 import { ContactEmailsContext, CurrentEmailContext } from "@/app/layout";
 import Loading from "@/app/(components)/Loading";
@@ -44,19 +44,19 @@ export default function Layout({ children }) {
       const email = session.user.email;
       if (email) {
         const cachedData = localStorage.getItem("contactsWithNicknames");
-        if (cachedData) {
+        if (false) {
           console.log(cachedData);
           setContactsWithNicknames(JSON.parse(cachedData));
           setContactEmailsContext(JSON.parse(cachedData));
           setCurrentEmail(JSON.parse(cachedData)[0].email);
+          // console.log(cachedData.contactsWithNicknames[0].email);
           setLoading(false);
         } else {
           const data = await fetchMessagesFromEmail(email);
           console.log(data);
           setContactsWithNicknames(data.contactsWithNicknames);
           setContactEmailsContext(data.contactsWithNicknames);
-          console.log(data.contactsWithNicknames[0].email);
-          setCurrentEmail(data.contactsWithNicknames[0].email);
+
           // Update local storage with new data
           localStorage.setItem(
             "contactsWithNicknames",

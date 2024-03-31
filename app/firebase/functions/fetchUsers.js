@@ -1,26 +1,37 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 
 const usersRef = collection(db, "messages");
 const nicknamesRef = collection(db, "nicknames");
 export const fetchMessagesFromEmail = async (email) => {
   console.log(email);
-  const q = query(usersRef, where("from_email", "==", email));
-  const querySnapshot = await getDocs(q);
+  // Query for messages where the from_email matches the provided email
+  const qFrom = query(usersRef, where("from_email", "==", email));
+  const querySnapshotFrom = await getDocs(qFrom);
 
-  const usersData = querySnapshot.docs.map((doc) => doc.data());
+  // Query for messages where the to_email matches the provided email
+  const qTo = query(usersRef, where("to_email", "==", email));
+  const querySnapshotTo = await getDocs(qTo);
 
-  console.log(usersData);
-  let res = { contacts: [] };
-  usersData.forEach((user) => {
-    if (!res["contacts"].includes(user.to_email)) {
-      res["contacts"].push(user.to_email);
-    }
-  });
+  // Combine data from both queries
+  const usersDataFrom = querySnapshotFrom.docs.map((doc) => doc.data());
+  const usersDataTo = querySnapshotTo.docs.map((doc) => doc.data());
+  const combinedData = [...usersDataFrom, ...usersDataTo];
 
-  // Fetch nicknames for each contact
+  console.log(combinedData);
+
+  // Fetch nicknames for each contact involved in the messages
+  console.log("DATA FROM: ", usersDataFrom);
+  console.log("DATA TO: ", usersDataTo);
+  const contacts = [
+    ...new Set(
+      [...usersDataFrom, ...usersDataTo].map((user) => user.from_email),
+    ),
+  ];
+  console.log(contacts);
   const contactsWithNicknames = await Promise.all(
-    res.contacts.map(async (contactEmail) => {
+    contacts.map(async (contactEmail) => {
+      console.log(contactEmail);
       const nicknameQuery = query(
         nicknamesRef,
         where("email", "==", contactEmail),
@@ -35,9 +46,11 @@ export const fetchMessagesFromEmail = async (email) => {
   );
 
   // Include nicknames in the response
-  res["contactsWithNicknames"] = contactsWithNicknames;
+  const res = {
+    contactsWithNicknames: contactsWithNicknames,
+    userData: combinedData,
+  };
 
-  res["userData"] = usersData;
   console.log(res);
   return res;
 };
@@ -65,7 +78,11 @@ export const fetchMessagesFromToEmail = async (emailFrom, emailTo) => {
 
   return combinedData;
 };
-export const insertMessage = async (message) => {
+export const insertMessage = async (message, nickname) => {
   const docRef = await addDoc(collection(db, "messages"), message);
+  const docRef2 = await addDoc(collection(db, "nicknames"), {
+    email: message.to_email,
+    nickname: nickname,
+  });
   console.log("Document written with ID: ", docRef.id);
 };
