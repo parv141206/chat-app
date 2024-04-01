@@ -36,23 +36,26 @@ export default function Page({ params }) {
         setMessages(JSON.parse(storedMessages));
       }
       console.log(storedMessages);
-    }
-    socket.on("recieve_message", (data) => {
-      if (data.roomId === id) {
-        setMessages((prevMessages) => {
-          const messageExists = prevMessages.some((msg) => msg.id === data.id);
-          if (!messageExists) {
-            localStorage.setItem(
-              `messages-${id}`,
-              JSON.stringify([...prevMessages, data]),
+      socket.on("recieve_message", (data) => {
+        console.log(" MessageRecieved", data);
+        if (data.roomId === id) {
+          setMessages((prevMessages) => {
+            const messageExists = prevMessages.some(
+              (msg) => msg.id === data.id,
             );
-            return [...prevMessages, data];
-          } else {
-            return prevMessages;
-          }
-        });
-      }
-    });
+            if (!messageExists) {
+              localStorage.setItem(
+                `messages-${id}`,
+                JSON.stringify([...prevMessages, data]),
+              );
+              return [...prevMessages, data];
+            } else {
+              return prevMessages;
+            }
+          });
+        }
+      });
+    }
 
     return () => {
       socket.off("recieve_message");
