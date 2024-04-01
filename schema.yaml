@@ -4,3 +4,7 @@ messages:
     email_from: string
     email_to: string
     content: string
+nicknames:
+  fields:
+    email: string
+    nickname: string

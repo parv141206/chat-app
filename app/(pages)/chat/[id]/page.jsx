@@ -16,6 +16,9 @@ export default function Page({ params }) {
   const [messages, setMessages] = useState([]);
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
+  const [currentEmailBuffer, setCurrentEmailBuffer] = useState(
+    localStorage.getItem("currentEmailBuffer") || "",
+  );
 
   function generateRoomId(email1, email2) {
     const sortedEmails = [email1, email2].sort();
@@ -24,12 +27,16 @@ export default function Page({ params }) {
   }
 
   useEffect(() => {
-    const id = generateRoomId(session.user.email, currentEmail);
-    const storedMessages = localStorage.getItem(`messages-${id}`);
-    if (storedMessages) {
-      setMessages(JSON.parse(storedMessages));
+    if (session && session.user) {
+      console.log("WTFFF???");
+      const id = generateRoomId(session.user.email, currentEmailBuffer);
+      console.log(id);
+      const storedMessages = localStorage.getItem(`messages-${id}`);
+      if (storedMessages) {
+        setMessages(JSON.parse(storedMessages));
+      }
+      console.log(storedMessages);
     }
-
     socket.on("recieve_message", (data) => {
       if (data.roomId === id) {
         setMessages((prevMessages) => {
@@ -50,18 +57,24 @@ export default function Page({ params }) {
     return () => {
       socket.off("recieve_message");
     };
-  }, [currentEmail, session]);
+  }, [currentEmailBuffer, session]); // Use currentEmailBuffer in the dependency array
 
   useEffect(() => {
-    if (session && session.user && currentEmail) {
-      const id = generateRoomId(session.user.email, currentEmail);
+    if (session && session.user) {
+      const id = generateRoomId(session.user.email, currentEmailBuffer);
       socket.emit("init", id);
 
       const fetch = async () => {
         setLoading(true);
+
         const data = await fetchMessagesFromToEmail(
           session.user.email,
-          currentEmail,
+          currentEmailBuffer,
+        );
+        console.log(currentEmailBuffer);
+        console.log(
+          "kjdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddsb",
+          data,
         );
         if (data.length > 0) {
           setMessages((prevMessages) => {
@@ -78,25 +91,26 @@ export default function Page({ params }) {
       };
       fetch();
     }
-  }, [currentEmail, session]);
+  }, [currentEmailBuffer, session]); // Use currentEmailBuffer in the dependency array
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const message = e.target.message.value;
     const date = getDateAsId();
-    if (session && session.user && currentEmail) {
-      const id = generateRoomId(session.user.email, currentEmail);
+    if (session && session.user && currentEmailBuffer) {
+      // Use currentEmailBuffer here
+      const id = generateRoomId(session.user.email, currentEmailBuffer);
       socket.emit("send_message", {
         id: date,
         from_email: session.user.email,
-        to_email: currentEmail,
+        to_email: currentEmailBuffer, // Use currentEmailBuffer here
         content: message,
         roomId: id,
       });
       setMessages((prevMessages) => {
         const newMessage = {
           from_email: session.user.email,
-          to_email: currentEmail,
+          to_email: currentEmailBuffer, // Use currentEmailBuffer here
           id: date,
           content: message,
         };
@@ -132,7 +146,7 @@ export default function Page({ params }) {
   return (
     <div>
       My Post: {params.id} <br />
-      Email: {currentEmail}
+      Email: {currentEmailBuffer} {/* Use currentEmailBuffer here */}
       <br />
       <div className="flex flex-col">{renderMessages()}</div>
       <br />

@@ -86,3 +86,10 @@ export const insertMessage = async (message, nickname) => {
   });
   console.log("Document written with ID: ", docRef.id);
 };
+export const validateUser=async (email , password )=>{
+  const usersRef = collection(db, "users");  
+  const q = query(usersRef, where("email", "==", email) , where("password", "==", password));
+  const querySnapshot = await getDocs(q);
+  const usersData = querySnapshot.docs.map((doc) => doc.data());
+  return usersData
+}

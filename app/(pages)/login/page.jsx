@@ -18,12 +18,21 @@ export default function Page() {
     formData.forEach((value, key) => {
       formDataObj[key] = value;
     });
-    const user = await signIn("credentials", {
-      ...formDataObj,
-      redirect: false,
-    });
-    console.log(user);
-    console.log("submitted", formDataObj);
+    try {
+      const res = await signIn("credentials", {
+        ...formDataObj,
+        redirect: false,
+      });
+      console.log(res);
+      if (res.error !== undefined && res.error !== null) {
+        alert("Wrong username or password");
+      } else {
+        window.location.href = "/chat";
+      }
+    } catch (error) {
+      alert("Nah bro");
+      alert(error);
+    }
   };
   useEffect(() => {
     var tl = gsap.timeline({ defaults: { duration: 2, ease: "none" } });

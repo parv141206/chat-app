@@ -1,3 +1,4 @@
+import { validateUser } from "@/app/firebase/functions/fetchUsers";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
@@ -16,7 +17,15 @@ export const authOptions = {
           email: credentials.email,
           password: credentials.password,
         };
-        return Promise.resolve(user);
+        const res = await validateUser(user.email, user.password);
+        console.log(res);
+        // Check if res is an array and has at least one element
+        if (Array.isArray(res) && res.length > 0) {
+          console.log("OK");
+          return Promise.resolve(user);
+        }
+        // Handle cases where res is not an array or is an empty array
+        return Promise.resolve(null);
       },
     }),
   ],

@@ -88,7 +88,10 @@ export default function Layout({ children }) {
                 className={`m-2 border-b border-slate-900 p-2 ${path.split("/")[2] === contact.email.trim() ? "rounded-lg border-0 dark:bg-indigo-900" : ""}`}
               >
                 <Link
-                  onClick={() => setCurrentEmail(contact.email)}
+                  onClick={() => {
+                    localStorage.setItem("currentEmailBuffer", contact.email);
+                    setCurrentEmail(contact.email);
+                  }}
                   href={`/chat/${contact.nickname.trim()}`}
                 >
                   <span className="p-1 dark:text-slate-500">#</span>
