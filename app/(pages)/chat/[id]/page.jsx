@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { fetchMessagesFromToEmail } from "@/app/firebase/functions/fetchUsers.js";
 import { CurrentEmailContext } from "@/app/layout";
 import { useSession } from "next-auth/react";
@@ -28,16 +28,12 @@ export default function Page({ params }) {
 
   useEffect(() => {
     if (session && session.user) {
-      console.log("WTFFF???");
       const id = generateRoomId(session.user.email, currentEmailBuffer);
-      console.log(id);
       const storedMessages = localStorage.getItem(`messages-${id}`);
       if (storedMessages) {
         setMessages(JSON.parse(storedMessages));
       }
-      console.log(storedMessages);
       socket.on("recieve_message", (data) => {
-        console.log(" MessageRecieved", data);
         if (data.roomId === id) {
           setMessages((prevMessages) => {
             const messageExists = prevMessages.some(
@@ -60,7 +56,7 @@ export default function Page({ params }) {
     return () => {
       socket.off("recieve_message");
     };
-  }, [currentEmailBuffer, session]); // Use currentEmailBuffer in the dependency array
+  }, [currentEmailBuffer, session]);
 
   useEffect(() => {
     if (session && session.user) {
@@ -73,11 +69,6 @@ export default function Page({ params }) {
         const data = await fetchMessagesFromToEmail(
           session.user.email,
           currentEmailBuffer,
-        );
-        console.log(currentEmailBuffer);
-        console.log(
-          "kjdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddsb",
-          data,
         );
         if (data.length > 0) {
           setMessages((prevMessages) => {
@@ -94,39 +85,43 @@ export default function Page({ params }) {
       };
       fetch();
     }
-  }, [currentEmailBuffer, session]); // Use currentEmailBuffer in the dependency array
+  }, [currentEmailBuffer, session]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const message = e.target.message.value;
-    const date = getDateAsId();
-    if (session && session.user && currentEmailBuffer) {
-      // Use currentEmailBuffer here
-      const id = generateRoomId(session.user.email, currentEmailBuffer);
-      socket.emit("send_message", {
-        id: date,
-        from_email: session.user.email,
-        to_email: currentEmailBuffer, // Use currentEmailBuffer here
-        content: message,
-        roomId: id,
-      });
-      setMessages((prevMessages) => {
-        const newMessage = {
-          from_email: session.user.email,
-          to_email: currentEmailBuffer, // Use currentEmailBuffer here
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      const message = e.target.message.value;
+      const date = getDateAsId();
+      if (session && session.user && currentEmailBuffer) {
+        const id = generateRoomId(session.user.email, currentEmailBuffer);
+        socket.emit("send_message", {
           id: date,
+          from_email: session.user.email,
+          to_email: currentEmailBuffer,
           content: message,
-        };
-        const updatedMessages = [...prevMessages, newMessage];
-        localStorage.setItem(`messages-${id}`, JSON.stringify(updatedMessages));
-        return updatedMessages;
-      });
-      e.target.message.value = "";
-    }
-  };
+          roomId: id,
+        });
+        setMessages((prevMessages) => {
+          const newMessage = {
+            from_email: session.user.email,
+            to_email: currentEmailBuffer,
+            id: date,
+            content: message,
+          };
+          const updatedMessages = [...prevMessages, newMessage];
+          localStorage.setItem(
+            `messages-${id}`,
+            JSON.stringify(updatedMessages),
+          );
+          return updatedMessages;
+        });
+        e.target.message.value = "";
+      }
+    },
+    [session, currentEmailBuffer],
+  );
 
   const renderMessages = () => {
-    // Sorting messages based on their id (timestamp)
     const sortedMessages = [...messages].sort((a, b) => a.id - b.id);
 
     return sortedMessages.map((message) =>
@@ -149,7 +144,7 @@ export default function Page({ params }) {
   return (
     <div>
       My Post: {params.id} <br />
-      Email: {currentEmailBuffer} {/* Use currentEmailBuffer here */}
+      Email: {currentEmailBuffer}
       <br />
       <div className="flex flex-col">{renderMessages()}</div>
       <br />

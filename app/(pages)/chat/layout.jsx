@@ -14,10 +14,7 @@ export default function Layout({ children }) {
   const { data: session } = useSession();
   const [contactEmails, setContactEmails] = useContext(ContactEmailsContext);
   const [currentEmail, setCurrentEmail] = useContext(CurrentEmailContext);
-  /**
-   * setContactEmailsContext
-   * @param {Array} data
-   */
+
   const setContactEmailsContext = useCallback(
     (data) => {
       let temp = [];
@@ -34,30 +31,24 @@ export default function Layout({ children }) {
         setContactEmails(temp);
         localStorage.setItem("contactEmails", JSON.stringify(temp));
       }
-      console.log(temp);
     },
     [setContactEmails],
   );
-  // Memoize the fetch function
+
   const fetch = useCallback(async () => {
     if (session && session.user) {
       const email = session.user.email;
       if (email) {
         const cachedData = localStorage.getItem("contactsWithNicknames");
-        if (false) {
-          console.log(cachedData);
+        if (cachedData) {
           setContactsWithNicknames(JSON.parse(cachedData));
           setContactEmailsContext(JSON.parse(cachedData));
           setCurrentEmail(JSON.parse(cachedData)[0].email);
-          // console.log(cachedData.contactsWithNicknames[0].email);
           setLoading(false);
         } else {
           const data = await fetchMessagesFromEmail(email);
-          console.log(data);
           setContactsWithNicknames(data.contactsWithNicknames);
           setContactEmailsContext(data.contactsWithNicknames);
-
-          // Update local storage with new data
           localStorage.setItem(
             "contactsWithNicknames",
             JSON.stringify(data.contactsWithNicknames),
@@ -66,15 +57,15 @@ export default function Layout({ children }) {
         }
       }
     }
-  }, [session, setContactEmailsContext, setCurrentEmail]); // Dependency array
+  }, [session, setContactEmailsContext, setCurrentEmail]);
 
   useEffect(() => {
     fetch();
-  }, [fetch]); // Use the memoized fetch function
+  }, [fetch]);
 
   return (
     <div className="min-h-screen gap-3 md:flex">
-      <div className=" left-0 top-0 flex  w-full flex-col  p-3 md:w-fit dark:bg-blue-950">
+      <div className="left-0 top-0 flex w-full flex-col p-3 md:w-fit dark:bg-blue-950">
         <ul className="sticky top-5">
           <h1 className="text-xl font-bold">Contacts</h1>
           {loading ? (
