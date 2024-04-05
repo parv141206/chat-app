@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
               <body
                 className={`${inter.className} ${
                   theme === "dark"
-                    ? "bg-slate-950 text-teal-50"
+                    ? "bg-slate-900 text-teal-50"
                     : "bg-teal-50 text-teal-950"
                 }`}
               >

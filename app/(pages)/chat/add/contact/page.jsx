@@ -1,4 +1,4 @@
-import AddContact from "@/app/(components)/AddContact";
+import AddContact from "@/app/(components)/Add/AddContact";
 import React from "react";
 
 export default function page() {

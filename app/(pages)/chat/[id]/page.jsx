@@ -1,5 +1,11 @@
 "use client";
-import React, { useContext, useEffect, useState, useCallback } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import { fetchMessagesFromToEmail } from "@/app/firebase/functions/fetchUsers.js";
 import { CurrentEmailContext } from "@/app/layout";
 import { useSession } from "next-auth/react";
@@ -20,11 +26,21 @@ export default function Page({ params }) {
     localStorage.getItem("currentEmailBuffer") || "",
   );
 
+  // Ref for the chat container
+  const chatContainerRef = useRef(null);
+  const messagesEndRef = useRef(null);
   function generateRoomId(email1, email2) {
     const sortedEmails = [email1, email2].sort();
     const roomId = sortedEmails.join("-");
     return roomId;
   }
+
+  useEffect(() => {
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+    scrollToBottom();
+  });
 
   useEffect(() => {
     if (session && session.user) {
@@ -70,6 +86,7 @@ export default function Page({ params }) {
           session.user.email,
           currentEmailBuffer,
         );
+        console.log(data);
         if (data.length > 0) {
           setMessages((prevMessages) => {
             const updatedMessages = [...prevMessages, ...data].filter(
@@ -86,6 +103,16 @@ export default function Page({ params }) {
       fetch();
     }
   }, [currentEmailBuffer, session]);
+
+  useEffect(() => {
+    // Use setTimeout with a delay of 0 to ensure the scroll action is performed after the DOM update
+    setTimeout(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
+      }
+    }, 0);
+  }, [messages]); // Depend on messages state
 
   const handleSubmit = useCallback(
     (e) => {
@@ -146,7 +173,11 @@ export default function Page({ params }) {
       My Post: {params.id} <br />
       Email: {currentEmailBuffer}
       <br />
-      <div className="flex flex-col">{renderMessages()}</div>
+      {/* Attach the ref to the chat container */}
+      <div ref={chatContainerRef} className="flex flex-col overflow-y-auto">
+        {renderMessages()}
+      </div>
+      <div ref={messagesEndRef} />
       <br />
       <form
         className="sticky bottom-5 z-10 flex w-full gap-5 p-5"

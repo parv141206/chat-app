@@ -1,40 +1,40 @@
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 
+const messagesRef = collection(db, "messages");
 const usersRef = collection(db, "messages");
 const nicknamesRef = collection(db, "nicknames");
-export const fetchMessagesFromEmail = async (email) => {
-  console.log(email);
-  // Query for messages where the from_email matches the provided email
-  const qFrom = query(usersRef, where("from_email", "==", email));
-  const querySnapshotFrom = await getDocs(qFrom);
 
-  // Query for messages where the to_email matches the provided email
-  const qTo = query(usersRef, where("to_email", "==", email));
+export const fetchMessagesFromEmail = async (email) => {
+  // Query for messages where the provided email is either the sender or the recipient
+  const qFrom = query(messagesRef, where("from_email", "==", email));
+  const qTo = query(messagesRef, where("to_email", "==", email));
+
+  // Fetch messages where the provided email is the sender
+  const querySnapshotFrom = await getDocs(qFrom);
+  const usersDataFrom = querySnapshotFrom.docs.map((doc) => doc.data());
+
+  // Fetch messages where the provided email is the recipient
   const querySnapshotTo = await getDocs(qTo);
+  const usersDataTo = querySnapshotTo.docs.map((doc) => doc.data());
 
   // Combine data from both queries
-  const usersDataFrom = querySnapshotFrom.docs.map((doc) => doc.data());
-  const usersDataTo = querySnapshotTo.docs.map((doc) => doc.data());
   const combinedData = [...usersDataFrom, ...usersDataTo];
-
   console.log(combinedData);
-
-  // Fetch nicknames for each contact involved in the messages
-  console.log("DATA FROM: ", usersDataFrom);
-  console.log("DATA TO: ", usersDataTo);
-  const contacts = [
-    ...new Set(
-      [...usersDataFrom, ...usersDataTo].map((user) => user.from_email),
-    ),
-  ];
-  console.log(contacts);
+  // Extract unique emails from both sets of messages
+  const uniqueEmails = new Set([
+    ...usersDataFrom.map((user) => user.from_email),
+    ...usersDataFrom.map((user) => user.to_email),
+    ...usersDataTo.map((user) => user.from_email),
+    ...usersDataTo.map((user) => user.to_email),
+  ]);
+  console.log("Unique emails: ", uniqueEmails);
   const contactsWithNicknames = await Promise.all(
-    contacts.map(async (contactEmail) => {
-      console.log(contactEmail);
+    Array.from(uniqueEmails).map(async (contactEmail) => {
       const nicknameQuery = query(
         nicknamesRef,
         where("email", "==", contactEmail),
+        where("for", "==", email),
       );
       const nicknameSnapshot = await getDocs(nicknameQuery);
       const nicknameDoc = nicknameSnapshot.docs[0]; // Assuming each email has a unique nickname
@@ -51,7 +51,6 @@ export const fetchMessagesFromEmail = async (email) => {
     userData: combinedData,
   };
 
-  console.log(res);
   return res;
 };
 
@@ -78,18 +77,31 @@ export const fetchMessagesFromToEmail = async (emailFrom, emailTo) => {
 
   return combinedData;
 };
-export const insertMessage = async (message, nickname) => {
+export const insertMessage = async (message, nickname, forEmail) => {
   const docRef = await addDoc(collection(db, "messages"), message);
   const docRef2 = await addDoc(collection(db, "nicknames"), {
     email: message.to_email,
     nickname: nickname,
+    for: forEmail,
   });
   console.log("Document written with ID: ", docRef.id);
 };
-export const validateUser=async (email , password )=>{
-  const usersRef = collection(db, "users");  
-  const q = query(usersRef, where("email", "==", email) , where("password", "==", password));
+export const validateUser = async (email, password) => {
+  const usersRef = collection(db, "users");
+  const q = query(
+    usersRef,
+    where("email", "==", email),
+    where("password", "==", password),
+  );
   const querySnapshot = await getDocs(q);
   const usersData = querySnapshot.docs.map((doc) => doc.data());
-  return usersData
-}
+  return usersData;
+};
+export const insertNickname = async (email, nickname, forEmail) => {
+  const docRef = await addDoc(collection(db, "nicknames"), {
+    email: email,
+    nickname: nickname,
+    for: forEmail,
+  });
+  console.log("Document written with ID: ", docRef.id);
+};

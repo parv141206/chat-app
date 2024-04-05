@@ -1,23 +1,31 @@
 "use client";
 import { useSession } from "next-auth/react";
 import React from "react";
-import { getDateAsId } from "../utils/getDateAsId";
-import { insertMessage } from "../firebase/functions/fetchUsers.js";
+import { getDateAsId } from "../../utils/getDateAsId";
+import { insertMessage } from "../../firebase/functions/fetchUsers.js";
 
 export default function AddContact() {
   const { data: session } = useSession();
   const handleSubmit = (e) => {
     e.preventDefault();
-    const nickname = e.target.nickname.value;
-    const email = e.target.email.value;
-    console.log(nickname, email);
-    const message = {
-      from_email: session.user.email,
-      to_email: email,
-      content: "Hello, I'd like to add you as a contact",
-      id: getDateAsId(),
-    };
-    insertMessage(message, nickname);
+    console.log(confirm("Sure?"));
+    if (
+      confirm(
+        `Are you sure, please check the email and nickname: @${e.target.email.value} #${e.target.nickname.value} `,
+      )
+    ) {
+      const nickname = e.target.nickname.value;
+      const email = e.target.email.value;
+      console.log(nickname, email);
+      const message = {
+        from_email: session.user.email,
+        to_email: email,
+        content: "Hello, I'd like to add you as a contact",
+        id: getDateAsId(),
+      };
+
+      insertMessage(message, nickname, session.user.email);
+    }
   };
   return (
     <div className="md:w-1/2">
