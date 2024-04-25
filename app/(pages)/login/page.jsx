@@ -1,84 +1,62 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { TextPlugin } from "gsap/TextPlugin";
+import React, { useState } from "react";
 import { signIn } from "next-auth/react";
-
-gsap.registerPlugin(ScrollTrigger, TextPlugin);
-
+import Link from "next/link";
 export default function Page() {
-  const [text, setText] = useState("Chit Chatz!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-
-    // Convert FormData to an object
-    const formDataObj = {};
-    formData.forEach((value, key) => {
-      formDataObj[key] = value;
-    });
-    try {
-      const res = await signIn("credentials", {
-        ...formDataObj,
-        redirect: false,
-      });
-      console.log(res);
-      alert(res);
-      if (res.error !== undefined && res.error !== null) {
-        alert("Wrong username or password");
-      } else {
-        window.location.href = "/chat";
-      }
-    } catch (error) {
-      alert("Nah bro");
-      alert(error);
-    }
+    await signIn("credentials", { email, password });
+    setEmail("");
+    setPassword("");
   };
-  useEffect(() => {
-    var tl = gsap.timeline({ defaults: { duration: 2, ease: "none" } });
-
-    tl.to("#scramble-2", {
-      duration: 1,
-      text: {
-        value: text,
-        chars: "lowerCase",
-        revealDelay: 0,
-        tweenLength: false,
-      },
-    });
-  }, [text]);
   return (
-    <div className="login  flex h-full min-h-screen items-center p-5">
-      <div className="container mx-auto flex items-center justify-between md:flex-row-reverse md:px-10">
-        <div className="md:1/2 ">
-          <div id="scramble-2" className="text-balance text-7xl font-extrabold">
-            Lets do it!
+    <div className="bg-indigo-100 dark:bg-indigo-950">
+      <div className="container mx-auto  flex min-h-screen items-center justify-center gap-10 ">
+        <div className="flex w-3/4 flex-col rounded-3xl bg-indigo-200 md:flex-row dark:bg-indigo-900">
+          <div className="m-10 flex w-1/2  flex-col">
+            <div className="font-montserrat text-7xl font-bold">Chatz</div>
+            <div className="text-3xl">Signin now to chat!</div>
           </div>
-        </div>
-        <div className="md:1/2 flex items-center justify-center">
-          <form onSubmit={handleSubmit}>
-            <div className="card m-10 flex flex-col gap-1 rounded-3xl p-5 backdrop-blur-lg">
-              <div className="text-center text-xl">Login</div>
-              <label htmlFor="username">Username</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                className="input"
-              />
-              <label htmlFor="email">Email</label>
-              <input type="email" id="email" name="email" className="input" />
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                className="input"
-              />
-              <button type="submit" className="btn btn-primary">
-                Login
-              </button>
+          <form
+            action=""
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-3 rounded-none bg-white p-5 md:w-1/2  md:rounded-e-3xl dark:bg-slate-900"
+          >
+            <label className="label" htmlFor="email">
+              Email
+            </label>
+            <input
+              className="input"
+              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+            />
+            <label className="label" htmlFor="password">
+              Password
+            </label>
+            <input
+              className="input"
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+            />
+            <button
+              type="submit"
+              // onClick={() => {
+              //   signIn("credentials", { email, password }, { redirect: true });
+              // }}
+            >
+              Login
+            </button>
+            <div className="flex justify-between">
+              <label className="" htmlFor=" no-account">
+                Dont have an account?
+              </label>
+              <Link href="/signup">
+                <button value="Signup" className="label">
+                  Signup
+                </button>
+              </Link>
             </div>
           </form>
         </div>
