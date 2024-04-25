@@ -16,7 +16,11 @@ export default function RootLayout({ children }) {
       <ContactEmailsContext.Provider value={[contactEmails, setContactEmails]}>
         <CurrentEmailContext.Provider value={[currentEmail, setCurrentEmail]}>
           <ThemeContext.Provider value={{ theme, setTheme }}>
-            <html lang="en" className={`${theme} overflow-x-hidden`}>
+            <html
+              lang="en"
+              data-theme
+              className={`${theme} font-montserrat overflow-x-hidden`}
+            >
               <head>
                 <title>Chatz</title>
                 <meta
@@ -30,7 +34,7 @@ export default function RootLayout({ children }) {
                 <link rel="icon" href="/favicon.ico" />
               </head>
               <body
-                className={`${inter.className} ${
+                className={` ${
                   theme === "dark"
                     ? "bg-slate-900 text-teal-50"
                     : "bg-teal-50 text-teal-950"

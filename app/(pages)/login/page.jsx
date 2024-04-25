@@ -24,6 +24,7 @@ export default function Page() {
         redirect: false,
       });
       console.log(res);
+      alert(res);
       if (res.error !== undefined && res.error !== null) {
         alert("Wrong username or password");
       } else {

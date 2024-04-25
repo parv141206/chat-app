@@ -15,7 +15,7 @@ import MessageSent from "@/app/(components)/MessageSent";
 import MessageRecieved from "@/app/(components)/MessageRecieved";
 import { FaArrowRight } from "react-icons/fa";
 import FullPageLoading from "@/app/(components)/FullPageLoading";
-const socket = io("http://localhost:5000");
+const socket = io("http://192.168.31.183:5000");
 
 export default function Page({ params }) {
   const [currentEmail, setCurrentEmail] = useContext(CurrentEmailContext);
@@ -169,34 +169,34 @@ export default function Page({ params }) {
   }
 
   return (
-    <div>
-      My Post: {params.id} <br />
-      Email: {currentEmailBuffer}
-      <br />
-      {/* Attach the ref to the chat container */}
-      <div ref={chatContainerRef} className="flex flex-col overflow-y-auto">
-        {renderMessages()}
-      </div>
-      <div ref={messagesEndRef} />
-      <br />
-      <form
-        className="sticky bottom-5 z-10 flex w-full gap-5 p-5"
-        onSubmit={handleSubmit}
-        action=""
-      >
-        <div className="input flex w-full items-center justify-around gap-3 backdrop-blur-2xl">
-          <input
-            className="input w-full rounded-none"
-            placeholder="Enter message"
-            name="message"
-            id="message"
-            type="text"
-          />
-          <button className="w-fit text-xl font-extrabold" type="submit">
-            <FaArrowRight />
-          </button>
+    <div className="">
+      <div className="m-3 md:m-10">
+        <br />
+        {/* Attach the ref to the chat container */}
+        <div ref={chatContainerRef} className="flex flex-col overflow-y-auto">
+          {renderMessages()}
         </div>
-      </form>
+        <div ref={messagesEndRef} />
+        <br />
+        <form
+          className="sticky bottom-5 z-10 flex w-full gap-5 p-5"
+          onSubmit={handleSubmit}
+          action=""
+        >
+          <div className="input flex w-full items-center justify-around gap-3 backdrop-blur-2xl">
+            <input
+              className="input w-full rounded-none"
+              placeholder="Enter message"
+              name="message"
+              id="message"
+              type="text"
+            />
+            <button className="w-fit text-xl font-extrabold" type="submit">
+              <FaArrowRight />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

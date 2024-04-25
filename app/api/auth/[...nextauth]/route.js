@@ -18,7 +18,7 @@ export const authOptions = {
           password: credentials.password,
         };
         const res = await validateUser(user.email, user.password);
-        console.log(res);
+        console.log("Res from firebase:", res);
         // Check if res is an array and has at least one element
         if (Array.isArray(res) && res.length > 0) {
           console.log("OK");
@@ -34,7 +34,7 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt", // or 'jwt'
+    strategy: "jwt", // or 'database'
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
   },
@@ -45,15 +45,16 @@ export const authOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        domain:
-          process.env.NODE_ENV === "production"
-            ? process.env.COOKIE_DOMAIN
-            : "localhost",
-        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+        domain: "192.168.31.183",
+        secure: false, // Use secure cookies in production
       },
     },
   },
+  logger: {
+    warn: console.warn,
+    error: console.error,
+    debug: console.debug,
+  },
 };
-
 export const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
