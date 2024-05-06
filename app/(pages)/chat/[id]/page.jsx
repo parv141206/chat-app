@@ -15,7 +15,7 @@ import MessageSent from "@/app/(components)/MessageSent";
 import MessageRecieved from "@/app/(components)/MessageRecieved";
 import { FaArrowRight } from "react-icons/fa";
 import FullPageLoading from "@/app/(components)/FullPageLoading";
-const socket = io("http://192.168.31.183:5000");
+const socket = io("http://192.168.120.208:5000");
 
 export default function Page({ params }) {
   const [currentEmail, setCurrentEmail] = useContext(CurrentEmailContext);

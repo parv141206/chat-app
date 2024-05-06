@@ -21,7 +21,7 @@ export default function Home() {
 
       <div id="after-header">
         <div className="py-20">
-          <section className="container mx-auto my-5 flex flex-col items-center p-3 md:flex-row md:px-5">
+          <section className="container mx-auto my-5 flex flex-col items-center p-3 md:flex-row md:px-10">
             <div className="mb-10 md:my-0 md:w-1/2">
               <h1 className="text-center text-3xl md:text-start md:text-7xl">
                 Connect to your loved ones simply with an email!

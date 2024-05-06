@@ -45,7 +45,7 @@ export const authOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        domain: "192.168.31.183",
+        domain: "192.168.120.208",
         secure: false, // Use secure cookies in production
       },
     },
